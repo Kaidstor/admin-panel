@@ -1,0 +1,71 @@
+{
+   "version": "2.0.0",
+   "presentation": {
+     "echo": false,
+     "reveal": "always",
+     "focus": false,
+     "panel": "dedicated",
+     "showReuseMessage": true
+   },
+   "tasks": [
+     {
+       "label": "Setup Development Environment",
+       "dependsOn": ["Start pnpm", "Start psql, redis", "Start site"],
+       "group": {
+         "kind": "build",
+         "isDefault": true
+       },
+       "runOptions": {
+         "runOn": "folderOpen"
+       }
+     },
+     {
+       "label": "Start pnpm",
+       "type": "shell",
+       "command": "pnpm run dev",
+       "options": {
+         "shell": {
+           "executable": "cmd.exe",
+           "args": ["/d", "/c"]
+         }
+       },
+       "isBackground": true,
+       "problemMatcher": [],
+       "presentation": {
+         "group": "my-group"
+       }
+     },
+     {
+       "label": "Start site",
+       "type": "shell",
+       "command": "ssh -R 7777:localhost:5173 -R 3000:localhost:3000 -o ServerAliveInterval=60 -o ServerAliveCountMax=2 kaidstor",
+       "options": {
+         "shell": {
+           "executable": "cmd.exe",
+           "args": ["/d", "/c"]
+         }
+       },
+       "isBackground": true,
+       "problemMatcher": [],
+       "presentation": {
+         "group": "my-group"
+       }
+     },
+     {
+       "label": "Start psql, redis",
+       "type": "shell",
+       "command": "cd docker && docker-compose up -d",
+       "options": {
+         "shell": {
+           "executable": "cmd.exe",
+           "args": ["/d", "/k"]
+         }
+       },
+       "isBackground": true,
+       "problemMatcher": [],
+       "presentation": {
+         "group": "my-group"
+       }
+     }
+   ]
+ }
