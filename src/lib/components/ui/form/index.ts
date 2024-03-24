@@ -40,7 +40,7 @@ export {
    FormInput,
    type Props,
    //
-   // Root as Button,
+   Root as Form,
    FormInput as Input,
    FormSelect as Select,
    type Props as ButtonProps,

@@ -9,6 +9,8 @@ const buttonVariants = tv({
 		variant: {
 			default: "bg-primary text-primary-foreground hover:bg-primary-hover",
 			secondary: "bg-tranparent  text-secondary-foreground shadow-sm",
+			dark: "bg-dark text-secondary-foreground hover:bg-black",
+			green: "bg-primary text-black hover:bg-primary/80 hover:text-black",
 		},
 		size: {
 			default: "h-10 px-4 py-2",

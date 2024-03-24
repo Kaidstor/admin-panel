@@ -12,9 +12,10 @@ const authUrls = [
 ]
 
 export const handle : Handle = async ({ event, resolve }) => {
-
    const user = await verifyAuthJWT(event)
    const url = new URL(event.request.url)
+
+   console.log(user);
 
    if (user) {
       event.locals.user = user         

@@ -76,6 +76,8 @@ export function superForm<T>(form: ValidationResult<T>, callback?: () => void) {
             const errorKey = key as keyof typeof result.errors;
             form.errors[errorKey] = result.errors[errorKey];
          }
+         
+         console.log(result);
 
          if (!result.valid) {
             Object.keys(result.errors).forEach((key) => {
@@ -108,7 +110,7 @@ export function superForm<T>(form: ValidationResult<T>, callback?: () => void) {
                invalidateAll()
             }
 
-            callback?.();
+            callback && callback();
          });
       }
       // Добавление слушателя событий

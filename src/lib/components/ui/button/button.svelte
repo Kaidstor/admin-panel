@@ -7,21 +7,25 @@
     size = "default",
     variant = "default",
     type,
-	 href,
+    href,
     ...props
   } = $props<ButtonProps>();
+
+
   const buttonClass = cn(
     buttonVariants({ variant, size, className: props["class"] })
   );
 
-  const onclick = (type == "link" && href)
-    ? () => goto(href)
-    : props.onclick;
+  const onclick = type == "link" && href ? () => goto(href) : props.onclick;
 
-  
   export { className as class };
 </script>
 
-<button type={(type && type != "link") ? type : "button"} {...props} {onclick} class={buttonClass}>
+<button
+  type={type && type != "link" ? type : "button"}
+  {...props}
+  {onclick}
+  class={buttonClass}
+>
   <slot />
 </button>

@@ -81,3 +81,10 @@ h1 {
 * {
   outline: none;
 }
+
+.place {
+  @apply min-w-24 h-16 px-4
+}
+.transition {
+  @apply w-16 h-16 bg-[url('/arrow-up.svg')] bg-contain
+}
