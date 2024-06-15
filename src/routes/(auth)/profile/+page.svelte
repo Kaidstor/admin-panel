@@ -14,7 +14,6 @@
 
 <Form.Root form={data.updateProfileForm} action="?/updateProfile" class="mt-10">
    <p>Мое имя: {user?.name}</p>
-   <Form.Input name="name"></Form.Input>
-   <p>Моя роль: {user?.role}</p>
-   <Button type="submit">ok</Button>
+   <Form.Input name="name" value={user?.name}></Form.Input>
+   <Button type="submit">Сохранить</Button>
 </Form.Root>

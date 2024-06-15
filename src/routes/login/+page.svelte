@@ -1,9 +1,8 @@
 <script lang="ts">
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Form from "$lib/components/ui/form";
-  import type { PageData } from "./$types";
 
-  let { data } = $props<{ data: PageData }>();
+  let { data } = $props();
 
   let isAuth = $state(true);
 </script>

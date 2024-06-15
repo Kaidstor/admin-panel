@@ -1,1 +1,0 @@
-ALTER TABLE "posts" ADD COLUMN "owner_id" bigserial NOT NULL;

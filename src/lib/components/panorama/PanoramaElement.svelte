@@ -1,51 +1,50 @@
 <script lang="ts">
   import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
   import { getContext } from "svelte";
-  import type { MarkerItem, PanoramaController } from "./index.svelte";
+  import type { PanoramaController } from "./index.svelte";
+  import type { IMarkerWithPlace } from "$lib";
 
-  let { yaw, pitch, id } = $props<MarkerItem>();
+  const panorama = getContext<PanoramaController>("panorama");
+  const { viewer } = panorama;
+
+  let { marker }: { marker: IMarkerWithPlace } = $props();
+  const { yaw, pitch } = $derived(marker);
+
+  const markerId = marker.id.toString();
   let element = $state<HTMLDivElement>();
 
+  const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
+
   $effect(() => {
-    const panorama = getContext<PanoramaController>("panorama");
-    const { viewer } = panorama;
-
-    const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
-
-    markersPlugin.addMarker({
-      id,
+    const markerData = {
+      id: markerId,
       position: { yaw, pitch },
       element,
       anchor: "center center",
-      data: {
-        type: 'place',
-        placeType: 'Стол'
-      },
-    });
-
-    const marker = markersPlugin.getMarker(id);
-
-    element!.addEventListener("mousedown", (e) => {
-      panorama.currentMarker = marker;
-      panorama.moveEnd = false;
-
-      e.stopPropagation();
-      e.preventDefault();
-    });
-
-    element!.addEventListener("mouseup", (e) => {
-      panorama.currentMarker = marker;
-      panorama.moveEnd = true;
-    });
-
+      data: marker,
+    };
+    if (!panorama.currentMarkerElement) {
+      try {
+        markersPlugin.addMarker(markerData);
+      } catch (e) {
+        markersPlugin.updateMarker(markerData);
+      }
+    } else {
+      markersPlugin.updateMarker(markerData);
+    }
     return () => {
-      console.log(`removed ${id}`)
-      markersPlugin.removeMarker(id);
+      console.log("removed");
     };
   });
 </script>
 
 <div
   bind:this={element}
-  class="rounded-lg text-black font-bold!flex justify-center items-center text-center draggable bg-[#c0ff16a8] text-base/[4rem] place"
-></div>
+  class:panorama-transition={marker?.type == "transition"}
+  class:text-transparent={marker?.type == "transition"}
+  class:place={marker?.type == "place"}
+  data-id={markerId}
+  class="rounded-lg text-black font-bold!flex justify-center items-center text-center draggable bg-[#c0ff16a8] text-base/[4rem] place marker"
+>
+  {marker.place?.name}
+</div>

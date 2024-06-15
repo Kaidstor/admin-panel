@@ -1,8 +1,8 @@
 <script lang="ts">
-   import type { User } from "$lib/db/schema";
+   import type { IUser } from "$lib/db/schema";
 
    const { worker } = $props<{
-      worker: User;
+      worker: IUser;
    }>();
 </script>
 

@@ -1,10 +1,179 @@
 {
-  "id": "631082e3-0204-4f85-bdc0-d54c70c0953f",
+  "id": "a6c99427-2c04-461f-8246-aba62cd53db0",
   "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "places": {
+    "public.markers": {
+      "name": "markers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "marker_types",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transition_panorama_id": {
+          "name": "transition_panorama_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "null"
+        },
+        "venue_id": {
+          "name": "venue_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "place_id": {
+          "name": "place_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "null"
+        },
+        "yaw": {
+          "name": "yaw",
+          "type": "numeric(19, 16)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pitch": {
+          "name": "pitch",
+          "type": "numeric(19, 16)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "markers_panorama_idx": {
+          "name": "markers_panorama_idx",
+          "columns": [
+            {
+              "expression": "venue_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "markers_transition_panorama_id_panoramas_id_fk": {
+          "name": "markers_transition_panorama_id_panoramas_id_fk",
+          "tableFrom": "markers",
+          "tableTo": "panoramas",
+          "columnsFrom": [
+            "transition_panorama_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "markers_venue_id_panoramas_id_fk": {
+          "name": "markers_venue_id_panoramas_id_fk",
+          "tableFrom": "markers",
+          "tableTo": "panoramas",
+          "columnsFrom": [
+            "venue_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "markers_place_id_places_id_fk": {
+          "name": "markers_place_id_places_id_fk",
+          "tableFrom": "markers",
+          "tableTo": "places",
+          "columnsFrom": [
+            "place_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.panoramas": {
+      "name": "panoramas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "post_id": {
+          "name": "post_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "panoramas_venue_idx": {
+          "name": "panoramas_venue_idx",
+          "columns": [
+            {
+              "expression": "post_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "panoramas_post_id_posts_id_fk": {
+          "name": "panoramas_post_id_posts_id_fk",
+          "tableFrom": "panoramas",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "post_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.places": {
       "name": "places",
       "schema": "",
       "columns": {
@@ -14,9 +183,28 @@
           "primaryKey": true,
           "notNull": true
         },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "panorama_id": {
+          "name": "panorama_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "venue_id": {
+          "name": "venue_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
         "type": {
           "name": "type",
           "type": "place_types",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
           "default": "'Стол'"
@@ -26,57 +214,59 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true,
-          "default": "'{\"photoes\": [], \"model\": null}'"
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "online": {
-          "name": "online",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
-        },
-        "platform": {
-          "name": "platform",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "active": {
-          "name": "active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
+          "default": "'{\"min\": 1, \"max\": 1}'::jsonb"
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true,
           "default": "CURRENT_TIMESTAMP"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp (3)",
           "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
+          "notNull": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
+      "indexes": {
+        "places_panorama_idx": {
+          "name": "places_panorama_idx",
+          "columns": [
+            {
+              "expression": "panorama_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "places_panorama_id_panoramas_id_fk": {
+          "name": "places_panorama_id_panoramas_id_fk",
+          "tableFrom": "places",
+          "tableTo": "panoramas",
+          "columnsFrom": [
+            "panorama_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "posts": {
-      "name": "posts",
+    "public.reservations": {
+      "name": "reservations",
       "schema": "",
       "columns": {
         "id": {
@@ -85,53 +275,59 @@
           "primaryKey": true,
           "notNull": true
         },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
+        "user_id": {
+          "name": "user_id",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
-        "type": {
-          "name": "type",
-          "type": "post_types",
+        "place_id": {
+          "name": "place_id",
+          "type": "bigint",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'restaurant'"
+          "notNull": false
         },
-        "post_status": {
-          "name": "post_status",
-          "type": "post_statuses",
+        "start_time": {
+          "name": "start_time",
+          "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
-        },
-        "meta": {
-          "name": "meta",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'"
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true,
           "default": "CURRENT_TIMESTAMP"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true,
           "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "reservations_place_id_places_id_fk": {
+          "name": "reservations_place_id_places_id_fk",
+          "tableFrom": "reservations",
+          "tableTo": "places",
+          "columnsFrom": [
+            "place_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "user_heads": {
+    "public.user_heads": {
       "name": "user_heads",
       "schema": "",
       "columns": {
@@ -143,18 +339,26 @@
         },
         "head_id": {
           "name": "head_id",
-          "type": "bigserial",
+          "type": "bigint",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {
-        "head_idx": {
-          "name": "head_idx",
+        "user_heads_idx": {
+          "name": "user_heads_idx",
           "columns": [
-            "head_id"
+            {
+              "expression": "head_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -196,7 +400,7 @@
       },
       "uniqueConstraints": {}
     },
-    "users": {
+    "public.users": {
       "name": "users",
       "schema": "",
       "columns": {
@@ -218,6 +422,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "photo": {
+          "name": "photo",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "password": {
           "name": "password",
           "type": "varchar(255)",
@@ -227,6 +437,7 @@
         "role": {
           "name": "role",
           "type": "user_roles",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
           "default": "'user'"
@@ -236,7 +447,80 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true,
-          "default": "{}"
+          "default": "'{}'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      }
+    },
+    "public.posts": {
+      "name": "posts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "post_types",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'restaurant'"
+        },
+        "post_status": {
+          "name": "post_status",
+          "type": "post_statuses",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'published'"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
         },
         "created_at": {
           "name": "created_at",
@@ -260,38 +544,50 @@
     }
   },
   "enums": {
-    "place_types": {
+    "public.marker_types": {
+      "name": "marker_types",
+      "schema": "public",
+      "values": [
+        "transition",
+        "place"
+      ]
+    },
+    "public.place_types": {
       "name": "place_types",
-      "values": {
-        "Стол": "Стол",
-        "Стул": "Стул"
-      }
+      "schema": "public",
+      "values": [
+        "Стол",
+        "Стул"
+      ]
     },
-    "post_statuses": {
+    "public.post_statuses": {
       "name": "post_statuses",
-      "values": {
-        "pending": "pending",
-        "published": "published",
-        "draft": "draft",
-        "archived": "archived",
-        "deleted": "deleted"
-      }
+      "schema": "public",
+      "values": [
+        "pending",
+        "published",
+        "draft",
+        "archived",
+        "deleted"
+      ]
     },
-    "post_types": {
+    "public.post_types": {
       "name": "post_types",
-      "values": {
-        "restaurant": "restaurant",
-        "place": "place"
-      }
+      "schema": "public",
+      "values": [
+        "restaurant",
+        "place"
+      ]
     },
-    "user_roles": {
+    "public.user_roles": {
       "name": "user_roles",
-      "values": {
-        "user": "user",
-        "client": "client",
-        "admin": "admin",
-        "hostess": "hostess"
-      }
+      "schema": "public",
+      "values": [
+        "user",
+        "client",
+        "admin",
+        "hostess"
+      ]
     }
   },
   "schemas": {},

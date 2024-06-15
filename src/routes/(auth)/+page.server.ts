@@ -2,14 +2,14 @@ import { isValidResult, superValidate } from "$lib/services/FormService.js";
 import { z } from "zod";
 import type { PageServerLoad } from "./$types.js";
 import { error, fail } from "@sveltejs/kit";
-import { db, db_posts } from "$lib";
+import { db, db_venues } from "$lib";
 import { eq } from "drizzle-orm";
 
 export const load: PageServerLoad = async (event) => {
   const venues = await db
     .select()
-    .from(db_posts)
-    .where(eq(db_posts.owner_id, event.locals.user.id));
+    .from(db_venues)
+    .where(eq(db_venues.owner_id, event.locals.user.id));
 
   const createVenueForm = await superValidate(event, createVenueFormSchema);
   return { createVenueForm, venues };
@@ -31,7 +31,7 @@ export const actions = {
 
     try {
       const [venue] = await db
-        .insert(db_posts)
+        .insert(db_venues)
         .values({
           name,
           owner_id: auth.id,

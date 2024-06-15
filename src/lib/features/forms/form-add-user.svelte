@@ -21,18 +21,3 @@
 
     export { className as class };
 </script>
-
-<Form {action} {form} class={cn("flex flex-col gap-5", props['class'])}>
-    <FormInput name="email" type="email" placeholder="Почта" />
-    <FormInput name="name" type="text" placeholder="Имя" />
-    {#if venues.length}
-        <FormSelect
-            defaultValue="Выбрать заведение"
-            name="venueId"
-            items={venues}
-        />
-    {/if}
-    <Button type="submit">Создать</Button>
-</Form>
-
-<div class="flex justify-center mt-2"><small class="text-gray">Пароль по умолчанию: password</small></div>

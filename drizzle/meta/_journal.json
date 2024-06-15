@@ -1,54 +1,12 @@
 {
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1707587846455,
-      "tag": "0000_thick_lizard",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1707896420309,
-      "tag": "0001_short_wildside",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1707896523260,
-      "tag": "0002_gray_network",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1707904746384,
-      "tag": "0003_plain_colossus",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1707910325716,
-      "tag": "0004_bumpy_grey_gargoyle",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1709533780846,
-      "tag": "0005_smiling_nehzno",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1709534283012,
-      "tag": "0006_numerous_franklin_storm",
+      "version": "7",
+      "when": 1718450763539,
+      "tag": "0000_wakeful_gravity",
       "breakpoints": true
     }
   ]

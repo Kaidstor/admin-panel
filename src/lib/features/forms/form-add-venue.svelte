@@ -23,5 +23,5 @@
 <Form {action} {form} {callback} class={cn("flex flex-col gap-5", props['class'])}>
    <FormInput name="name" type="text" placeholder="Название" />
    <FormInput name="address" type="text" placeholder="Адресс" />
-   <Button type="submit">Создать</Button>
+   <Button type="submit" class="bg-stone-300 hover:bg-stone-400">Создать</Button>
 </Form>

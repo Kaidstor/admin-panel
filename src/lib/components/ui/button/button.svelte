@@ -1,31 +1,25 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { cn } from "$lib/utils";
-  import { buttonVariants, type ButtonProps } from ".";
+	import { Button as ButtonPrimitive } from "bits-ui";
+	import { type Events, type Props, buttonVariants } from "./index.js";
+	import { cn } from "$lib/utils.js";
 
-  const {
-    size = "default",
-    variant = "default",
-    type,
-    href,
-    ...props
-  } = $props<ButtonProps>();
+	type $$Props = Props;
+	type $$Events = Events;
 
-
-  const buttonClass = cn(
-    buttonVariants({ variant, size, className: props["class"] })
-  );
-
-  const onclick = type == "link" && href ? () => goto(href) : props.onclick;
-
-  export { className as class };
+	let className: $$Props["class"] = undefined;
+	export let variant: $$Props["variant"] = "default";
+	export let size: $$Props["size"] = "default";
+	export let builders: $$Props["builders"] = [];
+	export { className as class };
 </script>
 
-<button
-  type={type && type != "link" ? type : "button"}
-  {...props}
-  {onclick}
-  class={buttonClass}
+<ButtonPrimitive.Root
+	{builders}
+	class={cn(buttonVariants({ variant, size, className }))}
+	type="button"
+	{...$$restProps}
+	on:click
+	on:keydown
 >
-  <slot />
-</button>
+	<slot />
+</ButtonPrimitive.Root>
