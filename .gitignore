@@ -1,4 +1,4 @@
-./docker/containers
+docker/containers
 .DS_Store
 node_modules
 /build
