@@ -15,10 +15,9 @@ export const createAuthJWT = async (data: JWTPayload) => {
   return jwt;
 };
 
-
 export const verifyAuthJWT = async (event: RequestEvent) => {
   try {
-    const token = event.cookies.get('token')
+    const token = event.cookies.get("token");
     if (!token) return;
 
     const { payload } = await jose.jwtVerify(

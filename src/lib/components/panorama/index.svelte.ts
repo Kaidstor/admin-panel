@@ -15,22 +15,30 @@ class PanoramaController {
   marker: IMarkerWithPlace | null = $state(null);
   currentMarkerElement: Marker | null = $state(null);
   current: IPanorama | null = $state(null);
-  panoramas: IPanorama[] = $state([]);
+  panoramas: IPanorama[];
   moveEnd: boolean = true;
 
   constructor(private viewerInstance: () => Viewer, panoramas: IPanorama[]) {
+    this.panoramas = panoramas;
+
     if (panoramas.length) {
-      this.panoramas = panoramas;
       this.current = panoramas[0];
     }
   }
 
+  push(panorama: IPanorama) {
+    this.panoramas.push(panorama);
+    this.setCurrent(panorama.id);
+  }
+
   get hasViewer() {
-    return!!this.viewerInstance();
+    return !!this.viewerInstance();
   }
 
   setCurrent(panorama_id: number) {
-    this.current = this.panoramas.find((panorama) => panorama.id == panorama_id)!;
+    this.current = this.panoramas.find(
+      (panorama) => panorama.id == panorama_id
+    )!;
     this.viewer.setPanorama(this.current.image, { showLoader: false, zoom: 1 });
   }
 
@@ -43,7 +51,8 @@ class PanoramaController {
   }
 
   removeMarkerById(id: number) {
-    this.current!.markers = this.current!.markers?.filter((marker) => marker.id != id) || [];
+    this.current!.markers =
+      this.current!.markers?.filter((marker) => marker.id != id) || [];
   }
 
   set currentMarker(marker) {

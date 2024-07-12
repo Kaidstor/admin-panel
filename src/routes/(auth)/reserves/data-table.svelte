@@ -3,89 +3,44 @@
    import { readable } from "svelte/store";
    import * as Table from "$lib/components/ui/table";
   
-   let {col_data}: {
-      col_data: {
+   let {filtered_reserved = $bindable()}: {
+      filtered_reserved: {
     id: number;
     user: {
+        email: string | null;
         id: number;
-        email: string;
-        name: string;
+        name: string | null;
     } | null;
     place: {
-        id: number;
+        name: string | null;
         type: "Стол" | "Стул";
+        id: number;
     } | null;
-    start_time: unknown;
+    start_time: string;
 }[]
    } = $props();
 
-   type Payment = {
-     id: string;
-     amount: number;
-     status: "pending" | "processing" | "success" | "failed";
-     email: string;
-   };
-    
-   const table = createTable(readable(col_data));
-
-   const columns = table.createColumns([
-     table.column({
-       accessor: ({ place }) => place?.id,
-       header: "ID стола",
-     }),
-     table.column({
-       accessor: ({ place }) => place?.type,
-       header: "Наименование",
-     }),
-     table.column({
-       accessor: 'start_time',
-       header: "Время",
-     }),
-     table.column({
-       accessor: ({ user }) => user?.name,
-       header: "Имя",
-     }),
-     table.column({
-       accessor: ({ user }) => user?.email,
-       header: "Email",
-     }),
-   ]);
-  
-   const { headerRows, pageRows, tableAttrs, tableBodyAttrs } =
-     table.createViewModel(columns);
  </script>
-  
- <div class="rounded-md border mt-10">
-   <Table.Root {...$tableAttrs}>
-     <Table.Header>
-       {#each $headerRows as headerRow}
-         <Subscribe rowAttrs={headerRow.attrs()}>
-           <Table.Row>
-             {#each headerRow.cells as cell (cell.id)}
-               <Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
-                 <Table.Head {...attrs}>
-                   <Render of={cell.render()} />
-                 </Table.Head>
-               </Subscribe>
-             {/each}
-           </Table.Row>
-         </Subscribe>
-       {/each}
-     </Table.Header>
-     <Table.Body {...$tableBodyAttrs}>
-       {#each $pageRows as row (row.id)}
-         <Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-           <Table.Row {...rowAttrs}>
-             {#each row.cells as cell (cell.id)}
-               <Subscribe attrs={cell.attrs()} let:attrs>
-                 <Table.Cell {...attrs}>
-                   <Render of={cell.render()} />
-                 </Table.Cell>
-               </Subscribe>
-             {/each}
-           </Table.Row>
-         </Subscribe>
-       {/each}
-     </Table.Body>
-   </Table.Root>
+
+ <div class="rounded-md border mt-5">
+  <Table.Root>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head>Наименование</Table.Head>
+        <Table.Head>Время</Table.Head>
+        <Table.Head>Имя</Table.Head>
+        <Table.Head>Email</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      {#each filtered_reserved as reserve, i (i)}
+        <Table.Row>
+          <Table.Cell>{reserve.place?.name}</Table.Cell>
+          <Table.Cell>{reserve.start_time}</Table.Cell>
+          <Table.Cell>{reserve.user?.name}</Table.Cell>
+          <Table.Cell>{reserve.user?.email}</Table.Cell>
+        </Table.Row>
+      {/each}
+    </Table.Body>
+  </Table.Root>
  </div>

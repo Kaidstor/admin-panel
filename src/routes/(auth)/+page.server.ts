@@ -1,31 +1,37 @@
-import { isValidResult, superValidate } from "$lib/services/FormService.js";
-import { z } from "zod";
 import type { PageServerLoad } from "./$types.js";
-import { error, fail } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import { db, db_venues } from "$lib";
 import { eq } from "drizzle-orm";
+import { createVenueFormSchema } from "$lib/zod/shemas.js";
+import { message, superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
 
 export const load: PageServerLoad = async (event) => {
+  const { locals } = event;
+
+  if (!locals.user) throw redirect(302, "/login");
+
   const venues = await db
     .select()
     .from(db_venues)
-    .where(eq(db_venues.owner_id, event.locals.user.id));
+    .where(eq(db_venues.owner_id, locals.user.id));
 
-  const createVenueForm = await superValidate(event, createVenueFormSchema);
-  return { createVenueForm, venues };
+  const addVenueForm = await superValidate(zod(createVenueFormSchema));
+  return { addVenueForm, venues };
 };
 
 export const actions = {
   addVenue: async (event) => {
     const { locals } = event;
-
     if (!locals.user) throw error(401, "unauthorized");
 
-    const { user: auth } = locals;
+    const form = await superValidate(event.request, zod(createVenueFormSchema));
 
-    const form = await superValidate(event, createVenueFormSchema);
-
-    if (!isValidResult(form)) return fail(400, form.errors);
+    if (!form.valid) {
+      return message(form, {
+        status: 400,
+      });
+    }
 
     const { name, address } = form.data;
 
@@ -34,21 +40,16 @@ export const actions = {
         .insert(db_venues)
         .values({
           name,
-          owner_id: auth.id,
+          owner_id: locals.user.id,
           meta: { address },
         })
         .returning();
 
-      return { invalidate: true, venue };
+      return message(form, "Заведение добавлено");
     } catch (e) {
-      return fail(500, {
-        email: "Ошибка на сервере",
+      return message(form, "Ошибка на сервере", {
+        status: 500,
       });
     }
   },
 };
-
-const createVenueFormSchema = z.object({
-  name: z.string().max(30).min(1),
-  address: z.string().min(5).max(30),
-});

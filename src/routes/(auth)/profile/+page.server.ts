@@ -1,57 +1,63 @@
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import { isValidResult, superValidate } from "$lib/services/FormService";
-import { z } from "zod";
 import { db, db_users } from "$lib";
 import { eq } from "drizzle-orm";
+import { message, superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
+import { updateProfileSchema } from "$lib/zod/shemas";
 
 export const load: PageServerLoad = async (event) => {
-   const { locals: { user } } = event;
+  const {
+    locals: { user },
+  } = event;
 
-   if (!user) {
-      throw redirect(302, '/login');
-   }
+  if (!user) {
+    throw redirect(302, "/login");
+  }
 
-   const updateProfileForm = await superValidate(event, updateProfileSchema);
+  const [current_user] = await db
+    .select()
+    .from(db_users)
+    .where(eq(db_users.id, user.id));
 
-   return {
-      updateProfileForm
-   }
-}
+  const updateProfileForm = await superValidate(
+    current_user,
+    zod(updateProfileSchema)
+  );
+
+  return {
+    updateProfileForm,
+  };
+};
 
 export const actions = {
-   updateProfile: async (event) => {
-      const { locals } = event;
+  updateProfile: async (event) => {
+    const { locals } = event;
 
-      if (!locals.user)
-         throw error(401, 'unauthorized');
+    if (!locals.user) throw error(401, "unauthorized");
 
-      const { user: auth } = locals
+    const { user: auth } = locals;
 
-      const form = await superValidate(event, updateProfileSchema);
+    const form = await superValidate(event.request, zod(updateProfileSchema));
 
-      if (!isValidResult(form))
-         return fail(400, form.errors);
+    if (!form.valid) return fail(400, { form });
 
-      const { name } = form.data
+    const { name } = form.data;
 
-      try {
-         const [user] = await db.update(db_users).set({
-            name
-         }).where(eq(db_users.id, auth.id)).returning();
+    try {
+      const [user] = await db
+        .update(db_users)
+        .set({
+          name,
+        })
+        .where(eq(db_users.id, auth.id))
+        .returning();
 
-         locals.user.name = user.name;
+      locals.user.name = user.name!;
 
-         return { invalidate: true, user };
-      }
-      catch (e) {
-         return fail(400, { email: "Пользователь с данным email уже зарегестрирован" });
-      }
-   }
-}
-
-
-const updateProfileSchema = z.object({
-   name: z.string().min(2, { message: 'Минимальная длина имени 1 символ' }).max(20, { message: 'Максимальная длина имени 20' }),
-   // email: z.string().email({ message: 'Не верно указан email' }),
-})
+      return message(form, "Данные пользователя обновлены");
+    } catch (e) {
+      return message(form, "Пользователь с данным email уже зарегестрирован");
+    }
+  },
+};

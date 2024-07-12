@@ -1,0 +1,22 @@
+version: '1.0'
+services:
+  db:
+    container_name: db_gidcaf
+    build: 
+      context: ./docker/postgres-custom
+      dockerfile: dockerfile
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - ./docker/containers/pg:/var/lib/postgresql/data
+
+  client:
+    container_name: client
+    build: .
+    volumes:
+      - ./static:/app/static
+    ports:
+      - "127.0.0.1:5173:5173"
+

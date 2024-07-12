@@ -12,17 +12,18 @@
   const marker = $derived(panorama.currentMarker)!;
 
   let start_time = $state<Date>();
+    
+  const reserve_arr = ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00"];
+  let reservation_time = $state<{  value: string; label: string }[]>([]);
 
-  const reserved_arr = marker?.place?.reservation_time && datesToHoursString(marker?.place?.reservation_time[Object.keys(marker?.place?.reservation_time!)[0]].map(d => new Date(d)))
-  const time_arr = ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00"]
-  
-
-  const free_arr = time_arr.filter(x =>!reserved_arr?.includes(x))
-  
-  console.log(reserved_arr, time_arr)
-  console.log(free_arr)
-
-  const reservation_time = free_arr.map(time => ({ value: time, label: time }));
+  $effect(() => {
+    if (marker){
+      const reserved_arr = (marker?.place?.reservation_time && datesToHoursString(marker?.place?.reservation_time[Object.keys(marker?.place?.reservation_time!)[0]].map(d => new Date(d)))) || []
+      const free_arr = reserve_arr.filter(x =>!reserved_arr?.includes(x))
+      
+      reservation_time = free_arr.map(time => ({ value: time, label: time }));
+    }
+  }) 
 </script>
 
 

@@ -42,12 +42,10 @@ export const load = async (event) => {
 };
 
 export const actions = {
-  newPanorama: async (event): Promise<IPanorama> => {
+  newPanorama: async (event): Promise<IPanorama & { message: string }> => {
     const { locals, params } = event;
 
     if (!locals.user) throw error(401, "unauthorized");
-
-    const { user } = locals;
 
     const [venue] = await db
       .select()
@@ -86,9 +84,9 @@ export const actions = {
         venue_id: +params.id!,
         image: location,
       })
-      .returning();
+      .returning({ id: db_panoramas.id, image: db_panoramas.image });
 
-    return { ...panorama, markers: [] };
+    return { ...panorama, markers: [], message: "Добавлена панорама" };
   },
   removePanorama: async (event) => {
     const { locals, params } = event;
@@ -177,7 +175,7 @@ export const actions = {
       }
     }
 
-    return { data: panoramas };
+    return { data: panoramas, message: "Панорама успешно сохранена" };
   },
 } satisfies Actions;
 

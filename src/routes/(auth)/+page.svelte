@@ -4,19 +4,20 @@
   import { Cross2, Plus } from "radix-icons-svelte";
   import FormAddVenue from "$lib/features/forms/form-add-venue.svelte";
 
-  let formCreateVenue = $state<HTMLDialogElement>();
+  let dialogCreateVenue = $state<HTMLDialogElement>();
   const { data } = $props();
+  const { venues, addVenueForm } = data;
 </script>
 
 <svelte:head>
   <title>Список заведений</title>
 </svelte:head>
 
-<div class="flex justify-between">
+<div class="flex justify-between items-center">
   <h1>Список заведений</h1>
 
-  <Button size="default" class="flex gap-3 items-center" onclick={() => formCreateVenue?.showModal()}>
-    <Plus />
+  <Button size="default" class="flex gap-3 items-center" onclick={() => dialogCreateVenue?.showModal()}>
+    +
   </Button>
 </div>
 
@@ -50,20 +51,16 @@
 </div>
 
 
-<dialog bind:this={formCreateVenue} class="px-12 py-8 rounded-lg bg-stone-100">
+<dialog bind:this={dialogCreateVenue} class="px-12 py-8 rounded-lg bg-stone-100">
 
   <button
-     onclick={() => formCreateVenue!.close()}
+     onclick={() => dialogCreateVenue!.close()}
   class="absolute top-2 right-2 p-2 text-white hover:text-primary">
      <Cross2 size={24} color="currentColor" />
   </button>
 
   <p class="text-4xl text-stone-700 font-bold">Добавить заведение</p>
   
-  <FormAddVenue
-     class="mt-8"
-     action="?/addVenue"
-     callback={() => formCreateVenue!.close()}
-     form={data.createVenueForm}
-  />
+  <FormAddVenue {addVenueForm} callback={() => dialogCreateVenue!.close()} />
+
 </dialog>

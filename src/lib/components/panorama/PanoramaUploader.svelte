@@ -14,7 +14,10 @@
   hidden
   onchange={async (event) => {
     const uploadedPanorama = await newPanorama(event)
-    uploadedPanorama && panorama!.panoramas.push(uploadedPanorama)
+
+    if (uploadedPanorama){
+       panorama.push(uploadedPanorama)
+    }
   }}
 />
 <button

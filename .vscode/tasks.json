@@ -32,7 +32,7 @@
      {
        "label": "Start site",
        "type": "shell",
-       "command": "ssh -R 7777:localhost:5173 -R 3000:localhost:3000 -o ServerAliveInterval=60 -o ServerAliveCountMax=2 kaidstor",
+       "command": "ssh -R 7777:localhost:3000 -o ServerAliveInterval=60 -o ServerAliveCountMax=2 kaidstor",
        "isBackground": true,
        "problemMatcher": [],
        "presentation": {

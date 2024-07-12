@@ -1,4 +1,6 @@
 import { deserialize } from "$app/forms";
+import { goto, invalidateAll } from "$app/navigation";
+import { toast } from "svelte-sonner";
 
 export const s_fetch = async <T>(
   url: string,
@@ -6,6 +8,7 @@ export const s_fetch = async <T>(
     body?: FormData | string | Record<string, any>;
     method?: "POST" | "GET";
     headers?: Record<string, string>;
+    invalidateAll?: boolean;
   }
 ) => {
   try {
@@ -24,10 +27,32 @@ export const s_fetch = async <T>(
     // @ts-ignore
     const response = await fetch(url, fetchOptions);
 
-    const text = await response.text();
+    const result = deserialize(await response.text());
 
-    return deserialize(text) as { type: string; status: number; data: T };
+    const { data, type, location } = result as {
+      data: T;
+      location?: string;
+      type: "success" | "failure" | "redirect";
+      status: number;
+    };
+
+    const { message }: { message?: string } = data || {};
+
+    if (type == "redirect") {
+      goto(location!);
+    }
+
+    if (type == "success") {
+      options?.invalidateAll && invalidateAll();
+      message && toast.success(message as string);
+    }
+
+    if (type == "failure" && typeof message == "string") {
+      toast.error(message);
+    }
+
+    return result as { type: string; status: number; data: T };
   } catch (e: any) {
-    console.log(e?.message || e)
+    console.log(e?.message || e);
   }
 };

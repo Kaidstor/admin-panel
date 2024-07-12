@@ -58,7 +58,8 @@ export const user_roles = pgEnum("user_roles", [
 export const db_users = pgTable("users", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).unique(),
+  phone: varchar("phone", { length: 12 }).unique(),
   avatar: varchar("photo", { length: 255 }),
   password: varchar("password", { length: 255 }).notNull(),
   role: user_roles("role").notNull().default("user"),
@@ -152,6 +153,11 @@ export const db_reservations = pgTable("reservations", {
 
   place_id: bigint("place_id", { mode: "number" }).references(
     () => db_places.id,
+    { onDelete: "cascade" }
+  ),
+
+  venue_id: bigint("venue_id", { mode: "number" }).references(
+    () => db_venues.id,
     { onDelete: "cascade" }
   ),
 

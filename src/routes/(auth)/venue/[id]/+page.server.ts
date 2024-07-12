@@ -1,10 +1,6 @@
 import { db } from "$lib";
-import {
-  db_venues,
-  db_user_heads,
-  db_users,
-  place_types_values,
-} from "$lib/db/schema.js";
+import { db_venues, db_user_heads, db_users } from "$lib/db/schema.js";
+import ReservationService from "$lib/services/ReservationService.js";
 import { error } from "@sveltejs/kit";
 import { and, eq, inArray } from "drizzle-orm";
 
@@ -44,9 +40,15 @@ export const load = async (event) => {
     return error(404, "venue not found");
   }
 
+  const reserves = await ReservationService.getVenueReservations(venue.id);
+  const places = await ReservationService.getPlaces(venue.id);
+
+  console.log(reserves);
+
   return {
     venue,
+    places,
     workers,
-    placeTypes: place_types_values,
+    reserves,
   };
 };

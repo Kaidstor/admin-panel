@@ -1,0 +1,7 @@
+node_modules
+.vscode
+docker
+drizzle
+compose.yml
+docker-compose.yml
+containers

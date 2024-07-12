@@ -95,6 +95,7 @@
 
 <style>
   .menu-item {
+    opacity: 0.85;
     position: relative;
     padding-left: 1rem;
     font-size: 1.5rem;
@@ -104,15 +105,18 @@
     transition: opacity 0.2s;
   }
   .menu-item:hover {
-    opacity: 0.5;
+    opacity: 1;
   }
   .menu-item.active::before {
     content: "";
     width: 3px;
     border-radius: 10px;
     height: 100%;
-    background-color: hsla(var(--primary) / 1);
+    background-color: #c0ff16;
     position: absolute;
     left: 0;
+  }
+  .menu-item.active {
+    color: #c0ff16;
   }
 </style>

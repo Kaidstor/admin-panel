@@ -1,43 +1,44 @@
 <script lang="ts">
-  import CalendarIcon from "lucide-svelte/icons/calendar";
   import {
-    DateFormatter,
     type DateValue,
-    getLocalTimeZone,
-    CalendarDate,
   } from "@internationalized/date";
-  import { cn } from "$lib/utils.js";
-  import { Button } from "$lib/components/ui/button/index.js";
-  import * as Popover from "$lib/components/ui/popover/index.js";
 
-  import { setContext } from "svelte";
-  import * as Select from "$lib/components/ui/select";
   import { Settings } from "lucide-svelte";
-  import type { DateRange } from "bits-ui";
-  import { RangeCalendar } from "$lib/components/ui/range-calendar/index.js";
+  import RuCalendar from "$lib/components/calendars/ru-calendar.svelte";
+  import { toast } from "svelte-sonner";
+  import Button from "$lib/components/ui/button/button.svelte";
 
-  const df = new DateFormatter("ru-RU", {
-    dateStyle: "medium",
-  });
+  const isTimeInRange = (reserveTime: string, checkTime: string): boolean => {
+    const parseTime = (time: string): Date => {
+      const [hours, minutes] = time.split(':').map(Number);
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+      return date;
+    };
+
+    const reserveDate = parseTime(reserveTime);
+    const checkDate = parseTime(checkTime);
+
+    // На час раньше и на два часа позже
+    const oneHourBefore = new Date(reserveDate);
+    oneHourBefore.setHours(reserveDate.getHours() - 1);
+
+    const twoHoursAfter = new Date(reserveDate);
+    twoHoursAfter.setHours(reserveDate.getHours() + 2);
+
+    console.log({reserveTime, checkTime, checkDate, oneHourBefore, twoHoursAfter});
+
+    return checkDate >= oneHourBefore && checkDate <= twoHoursAfter;
+  };
 
   
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
-  const date = today.getDate();
-
-
-  let value: DateRange | undefined = $state({
-    start: new CalendarDate(year, month, date),
-    end: new CalendarDate(year, month, date).add({ days: 20 }),
-  });
-
-  let startValue: DateValue | undefined = $state();
-
   const { data } = $props();
 
+  let {places} = data;
 
-  setContext("place_types", data.placeTypes);
+  let date: DateValue | undefined = $state();
+  let time: string | undefined = $state();
+
 </script>
 
 <svelte:head>
@@ -56,18 +57,19 @@
     <h1 class="text-white">
       {data.venue.name}
     </h1>
-    <p class="text-gray mt-2">г. Тюмень, ул. Республики, 26</p>
+    <p class="text-gray mt-2">{data.venue.meta.address}</p>
   </div>
   <a
     href="/venue/{data.venue.id}/edit"
-    class="inline-flex items-center justify-center font-normal whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-lg/[1.5rem] hover:shadow-[0px_2px_8px_4px] hover:shadow-primary/50 duration-300 transition bg-primary text-primary-foreground hover:bg-primary-hover rounded-full h-12 w-12 p-2"
+    class="inline-flex font-medium gap-2 items-center justify-center whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-lg/[1.5rem] hover:shadow-[0px_2px_8px_4px] hover:shadow-primary/50 duration-300 transition bg-primary text-primary-foreground hover:bg-primary-hover rounded-full h-12 p-2 pl-3"
   >
-    <Settings />
+      3д модель
+      <Settings />
   </a>
 </div>
 
 <div class="mt-10">
-  <p class="text-2xl">Привязать хостес</p>
+  <!-- <p class="text-2xl">Привязать хостес</p>
   <form action="" class="mt-5">
     <Select.Root>
       <Select.Trigger class="w-[180px]">
@@ -82,7 +84,7 @@
           {/if}
 
           {#each data.workers as worker}
-            <Select.Item value={worker.value} label={worker.label}
+            <Select.Item value={worker.value} label={worker.label!}
               >{worker.label}</Select.Item
             >
           {/each}
@@ -90,47 +92,32 @@
       </Select.Content>
       <Select.Input name="venueId" />
     </Select.Root>
-  </form>
+  </form> -->
 
-  <p class="text-2xl mt-10">Информация о бронях</p>
-
-  <div class="grid gap-2 mt-5">
-    <Popover.Root openFocus>
-      <Popover.Trigger asChild let:builder>
-        <Button
-          variant="outline"
-          class={cn(
-            "w-[300px] justify-start text-left font-normal",
-            !value && "text-muted-foreground"
-          )}
-          builders={[builder]}
-        >
-          <CalendarIcon class="mr-2 h-4 w-4" />
-          {#if value && value.start}
-            {#if value.end}
-              {df.format(value.start.toDate(getLocalTimeZone()))} - {df.format(
-                value.end.toDate(getLocalTimeZone())
-              )}
-            {:else}
-              {df.format(value.start.toDate(getLocalTimeZone()))}
-            {/if}
-          {:else if startValue}
-            {df.format(startValue.toDate(getLocalTimeZone()))}
-          {:else}
-            Выбрать дату
-          {/if}
-        </Button>
-      </Popover.Trigger>
-      <Popover.Content class="w-auto p-0" align="start">
-        <RangeCalendar
-          bind:value
-          bind:startValue
-          minValue={new CalendarDate(year, month, date)}
-          initialFocus
-          numberOfMonths={2}
-          placeholder={value?.start}
-        />
-      </Popover.Content>
-    </Popover.Root>
+  <p class="text-2xl mt-10">Проверить возможность брони</p>
+  
+  <div class="flex gap-5 mt-5">
+    <RuCalendar bind:value={date}/>
+    <input bind:value={time} type="time" step="1800" class="text-white rounded-md p-1.5">
   </div>
+  {#if date}
+    <div class="mt-5">
+      {#each places as item (item.id)}
+        {#if !data.reserves.find(r => {
+            const isSameDate = r.start_time.toLocaleDateString('sv-SE') == date!.toString();
+
+            const reserve_time = r.start_time.toLocaleTimeString('ru-RU', { timeZone: "Europe/Moscow", hour: '2-digit', minute: '2-digit' });
+
+            const isNotValidTime = time && isTimeInRange(reserve_time, time);
+            console.log({isNotValidTime, reserve_time})
+
+            return r.place_id == item.id && isSameDate && isNotValidTime
+        })}
+          <button class="py-2 px-4 rounded-md bg-stone-800 w-fit hover:bg-stone-700 cursor-pointer" onclick={() => toast.info('Кнопка ничего не делает')}>
+            {item.name}
+          </button>
+        {/if}
+      {/each}
+    </div>  
+  {/if}
 </div>

@@ -6,8 +6,8 @@
   import { s_fetch } from "$lib/api/index.js";
 
   const { data } = $props();
-  let panoramas = $state<IPanorama[]>(data.panoramas);
 
+  let panoramas = $state<IPanorama[]>(data.panoramas);
   setContext("place_types", data.placeTypes);
 
   function saveVenue() {
@@ -36,8 +36,8 @@
 </div>
 
 <div class="mt-10">
-  <p class="text-3xl mt-10">Настройка заведения</p>
-  <Panorama.Root {panoramas} class="mt-5">
+  <p class="text-3xl mt-10">Настройка заведения {panoramas.length} <button onclick={() => console.log({panoramas, dpanorama: data.panoramas})}>info</button></p>
+  <Panorama.Root bind:panoramas class="mt-5">
     <Panorama.Constructor />
 
     {#if !panoramas.length}

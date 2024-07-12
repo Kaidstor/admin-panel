@@ -12,7 +12,7 @@
 
   const {
     children,
-    panoramas,
+    panoramas = $bindable(),
     ...props
   }: {
     panoramas: IPanorama[];

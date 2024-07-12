@@ -23,9 +23,9 @@
 
 <div>
   <h1 class="text-white max-md:text-3xl">
-    Заведение {data.venueId}
+    {data.venue.name}
   </h1>
-  <p class="text-gray">г. Тюмень, ул. Республики, 26</p>
+  <p class="text-gray mt-2">{data.venue.meta.address}</p>
 </div>
 
 <div class="mt-10 max-md:mt-5">

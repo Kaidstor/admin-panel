@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS "reservations" (
 	"id" bigserial PRIMARY KEY NOT NULL,
 	"user_id" bigint NOT NULL,
 	"place_id" bigint,
+	"venue_id" bigint,
 	"start_time" timestamp (3) NOT NULL,
 	"created_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updated_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -73,14 +74,16 @@ CREATE TABLE IF NOT EXISTS "user_heads" (
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" bigserial PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
-	"email" varchar(255) NOT NULL,
+	"email" varchar(255),
+	"phone" varchar(12),
 	"photo" varchar(255),
 	"password" varchar(255) NOT NULL,
 	"role" "user_roles" DEFAULT 'user' NOT NULL,
 	"meta" jsonb DEFAULT '{}' NOT NULL,
 	"created_at" timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updated_at" timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	CONSTRAINT "users_email_unique" UNIQUE("email")
+	CONSTRAINT "users_email_unique" UNIQUE("email"),
+	CONSTRAINT "users_phone_unique" UNIQUE("phone")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "posts" (
@@ -126,6 +129,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "reservations" ADD CONSTRAINT "reservations_place_id_places_id_fk" FOREIGN KEY ("place_id") REFERENCES "public"."places"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "reservations" ADD CONSTRAINT "reservations_venue_id_posts_id_fk" FOREIGN KEY ("venue_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

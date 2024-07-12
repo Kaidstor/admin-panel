@@ -1,5 +1,5 @@
 {
-  "id": "a6c99427-2c04-461f-8246-aba62cd53db0",
+  "id": "2d58046d-e70d-4753-b0ce-58d5e9188955",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -287,6 +287,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "venue_id": {
+          "name": "venue_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
         "start_time": {
           "name": "start_time",
           "type": "timestamp (3)",
@@ -316,6 +322,19 @@
           "tableTo": "places",
           "columnsFrom": [
             "place_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reservations_venue_id_posts_id_fk": {
+          "name": "reservations_venue_id_posts_id_fk",
+          "tableFrom": "reservations",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "venue_id"
           ],
           "columnsTo": [
             "id"
@@ -420,7 +439,13 @@
           "name": "email",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(12)",
+          "primaryKey": false,
+          "notNull": false
         },
         "photo": {
           "name": "photo",
@@ -473,6 +498,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
+          ]
+        },
+        "users_phone_unique": {
+          "name": "users_phone_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "phone"
           ]
         }
       }
@@ -591,6 +623,7 @@
     }
   },
   "schemas": {},
+  "sequences": {},
   "_meta": {
     "columns": {},
     "schemas": {},

@@ -25,7 +25,7 @@ export const load = async (event) => {
   const panoramas = await PanoramaService.getVenuePanoramaClient(venue.id);
 
   return {
-    venueId: params.id,
+    venue,
     panoramas,
     placeTypes: place_types_values,
   };
@@ -36,6 +36,15 @@ export const actions = {
     const { locals, params } = event;
 
     if (!locals.user) throw error(401, "unauthorized");
+
+    const venue_id = Number(params.id);
+
+    if (!venue_id) throw error(400, "Invalid venue id");
+
+    const [venue] = await db
+      .select()
+      .from(db_venues)
+      .where(eq(db_venues.id, venue_id));
 
     const data = await event.request.json();
 
@@ -60,11 +69,12 @@ export const actions = {
 
     await db.insert(db_reservations).values({
       user_id: locals.user.id,
+      venue_id: venue.id,
       place_id: data.place_id,
       start_time: start_time,
     });
 
-    return { ok: true, placeReserves };
+    return { message: "Место успешно забронировано", placeReserves };
   },
 } satisfies Actions;
 

@@ -4,7 +4,8 @@ import { db, db_user_heads, db_users } from "$lib";
 import { and, eq } from "drizzle-orm";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
-import { isValidResult, superValidate } from "$lib/services/FormService";
+import { message, superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
 
 export const load: PageServerLoad = async (event) => {
   const { params, auth } = isLocalAuth<RouteParams>(event);
@@ -28,7 +29,7 @@ export const load: PageServerLoad = async (event) => {
     throw error(404, "У вас нет доступа для просмотра данного профиля");
   }
 
-  const updateWorkerForm = await superValidate(event, updateWorkerSchema);
+  const updateWorkerForm = await superValidate(zod(updateWorkerSchema));
 
   return { user, updateWorkerForm };
 };
@@ -37,22 +38,28 @@ export const actions = {
   updateWorkerProfile: async (event) => {
     const { params, auth } = isLocalAuth<RouteParams>(event);
 
+    const form = await superValidate(zod(updateWorkerSchema));
+
+    if (!form.valid) {
+      return fail(400, { form });
+    }
+
     const [user] = await db
       .select()
       .from(db_user_heads)
       .where(eq(db_user_heads.id, +params.id));
 
     if (!user) {
-      return error(400, "Пользователь не найден!");
+      return message(form, "Пользователь не найден!", {
+        status: 404,
+      });
     }
 
     if (user.head_id != auth.id) {
-      return error(400, "У вас нет доступа для просмотра данного профиля");
+      return message(form, "У вас нет доступа для просмотра данного профиля", {
+        status: 400,
+      });
     }
-
-    const form = await superValidate(event, updateWorkerSchema);
-
-    if (!isValidResult(form)) return fail(400, form.errors);
 
     const { name } = form.data;
 

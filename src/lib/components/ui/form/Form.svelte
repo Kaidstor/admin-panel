@@ -1,34 +1,28 @@
 <script lang="ts">
-   import { setContext } from "svelte";
-   import { superForm, type ValidationResult } from "$lib/services/FormService";
-   import { cn } from "$lib/utils";
+  import { setContext } from "svelte";
+  import { cn } from "$lib/utils";
 
-   const { form, method, action, callback, ...props } = $props<{
-      form: ValidationResult<any>;
-      action?: string;
-      method?: string;
-      class?: string;
-      callback?: () => void;
-      children?: unknown;
-   }>();
+  const { form, errors, method = "POST", action, CLASS, enhance, children } = $props<{
+    form: any;
+    errors: any;
+    enhance: any;
+    method?: string;
+    CLASS?: string;
+    children?: unknown;
+  }>();
 
-   const createWorkerForm = $state(form);
-   const { errors, enhance } = $derived(superForm(createWorkerForm, callback));
+  
 
-   setContext("form", {
-      get errors() {
-         return errors;
-      },
-   });
-
-   export { className as class };
+  setContext("form", {
+    get values() {
+      return form;
+    },
+    get errors() {
+      return errors;
+    },
+  });
 </script>
 
-<form
-   {method}
-   {action}
-   use:enhance
-   class={cn("flex flex-col gap-5", props['class'])}
->
-   <slot />
+<form {method} use:enhance class={cn("flex flex-col gap-5", CLASS)}>
+  {@render children()}
 </form>

@@ -3,7 +3,7 @@ import { db_venues, db_user_heads, db_users, type IUser } from "$lib/db/schema";
 import { type Actions, fail, error } from "@sveltejs/kit";
 import { eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { superValidate } from "sveltekit-superforms";
+import { message, superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import type { PageServerLoad } from "./$types";
 import { createWorkerFormSchema } from "$lib/zod/shemas";
@@ -26,7 +26,7 @@ export const load: PageServerLoad = async (event) => {
       .where(inArray(db_users.id, subordinates));
   }
 
-  const createWorkerForm = await superValidate(zod(createWorkerFormSchema));
+  const addWorkerForm = await superValidate(zod(createWorkerFormSchema));
 
   const venues = await db
     .select({
@@ -36,7 +36,7 @@ export const load: PageServerLoad = async (event) => {
     .from(db_venues)
     .where(eq(db_venues.owner_id, user.id));
 
-  return { workers, venues, user, createWorkerForm };
+  return { workers, venues, user, addWorkerForm };
 };
 
 export const actions = {
@@ -59,7 +59,7 @@ export const actions = {
     const { name, email } = form.data;
 
     try {
-      const user = await db.transaction(async (t) => {
+      await db.transaction(async (t) => {
         const [user] = await t
           .insert(db_users)
           .values({
@@ -74,10 +74,9 @@ export const actions = {
           head_id: auth.id,
           id: user.id,
         });
-
-        return user;
       });
-      return { user, form };
+
+      return message(form, "Хостес успешно добавлен");
     } catch (e) {
       form.valid = false;
       form.errors.email = ["Пользователь с данным email уже зарегестрирован"];
