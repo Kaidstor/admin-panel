@@ -1,6 +1,6 @@
 import { db } from "$lib/db";
 import { db_places, db_reservations, db_users } from "$lib/db/schema";
-import { and, eq, gte, sql } from "drizzle-orm";
+import { and, eq, gte, not, sql } from "drizzle-orm";
 
 export class ReservationService {
   async placeReserves(place_id: number, condition?: any) {
@@ -17,7 +17,13 @@ export class ReservationService {
 
   async getVenueReservations(venue_id: number) {
     return await db
-      .select()
+      .select({
+        id: db_reservations.id,
+        user_id: db_reservations.user_id,
+        place_id: db_reservations.place_id,
+        venue_id: db_reservations.venue_id,
+        start_time: sql<string>`${db_reservations.start_time}::text`,
+      })
       .from(db_reservations)
       .where(eq(db_reservations.venue_id, venue_id));
   }
@@ -50,7 +56,9 @@ export class ReservationService {
       return await db
         .select()
         .from(db_places)
-        .where(eq(db_places.venue_id, venue_id));
+        .where(
+          and(eq(db_places.venue_id, venue_id), not(eq(db_places.name, "")))
+        );
 
     return await db.select().from(db_places);
   }

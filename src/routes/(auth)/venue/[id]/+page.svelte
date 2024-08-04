@@ -26,7 +26,7 @@
     const twoHoursAfter = new Date(reserveDate);
     twoHoursAfter.setHours(reserveDate.getHours() + 2);
 
-    console.log({reserveTime, checkTime, checkDate, oneHourBefore, twoHoursAfter});
+    console.log({ reserveTime, checkTime });
 
     return checkDate >= oneHourBefore && checkDate <= twoHoursAfter;
   };
@@ -101,16 +101,14 @@
     <input bind:value={time} type="time" step="1800" class="text-white rounded-md p-1.5">
   </div>
   {#if date}
-    <div class="mt-5">
+    <div class="mt-5 flex gap-2">
       {#each places as item (item.id)}
         {#if !data.reserves.find(r => {
-            const isSameDate = r.start_time.toLocaleDateString('sv-SE') == date!.toString();
-
-            const reserve_time = r.start_time.toLocaleTimeString('ru-RU', { timeZone: "Europe/Moscow", hour: '2-digit', minute: '2-digit' });
+            console.log(r.start_time)
+            const isSameDate = r.start_time.split(' ')[0] == date!.toString();
+            const reserve_time = r.start_time.split(' ')[1].slice(0, 5);
 
             const isNotValidTime = time && isTimeInRange(reserve_time, time);
-            console.log({isNotValidTime, reserve_time})
-
             return r.place_id == item.id && isSameDate && isNotValidTime
         })}
           <button class="py-2 px-4 rounded-md bg-stone-800 w-fit hover:bg-stone-700 cursor-pointer" onclick={() => toast.info('Кнопка ничего не делает')}>

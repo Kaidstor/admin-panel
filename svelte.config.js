@@ -10,7 +10,7 @@ const config = {
 			build: {
 				outDir: './dist',
 			}
-		})
+		}),
 	},
 };
 
